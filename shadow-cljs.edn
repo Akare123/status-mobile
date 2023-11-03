@@ -104,8 +104,7 @@
    :output-dir "target/test"
    :optimizations :simple
    :target :node-test
-   ;; Uncomment line below to `make test-watch` a specific file
-   ;; :ns-regexp "status-im2.subs.messages-test$"
+   :ns-regexp #shadow/env "TEST_NS_REGEXP"
    :main status-im.test-runner/main
    ;; set :ui-driven to true to let shadow-cljs inject node-repl
    :ui-driven true

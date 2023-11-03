@@ -336,6 +336,7 @@ shadow-server:##@ Start shadow-cljs in server mode for watching
 	yarn shadow-cljs server
 
 test-watch: export TARGET := clojure
+test-watch: export TEST_NS_REGEXP := -test$
 test-watch: ##@ Watch tests and re-run no changes to cljs files
 	yarn install
 	nodemon --exec 'yarn shadow-cljs compile mocks && yarn shadow-cljs compile test && node --require ./test-resources/override.js target/test/test.js' -e cljs
@@ -349,6 +350,7 @@ test-watch-for-repl: ##@ Watch tests and support REPL connections
 		'until [ -f ./target/test/test.js ] ; do sleep 1 ; done ; node --require ./test-resources/override.js ./target/test/test.js --repl'
 
 test: export TARGET := clojure
+test: export TEST_NS_REGEXP := -test$
 test: ##@test Run tests once in NodeJS
 	# Here we create the gyp bindings for nodejs
 	yarn install

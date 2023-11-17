@@ -241,3 +241,7 @@
 
       :else
       (str amount))))
+
+(defn to-uint64 [value]
+  (let [shifted-value (-> (BigNumber. value) (.shift 0))]
+    (.toNumber shifted-value)))

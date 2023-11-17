@@ -61,6 +61,9 @@
            :buy-action    #(rf/dispatch [:show-bottom-sheet
                                          {:content buy-drawer}])
            :bridge-action #(rf/dispatch [:open-modal :wallet-bridge])}]
+           [quo/button
+          {:on-press #(rf/dispatch [:wallet/get-suggested-routes])}
+          "send"]
          [quo/tabs
           {:style            style/tabs
            :size             32

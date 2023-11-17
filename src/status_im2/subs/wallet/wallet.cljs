@@ -39,7 +39,7 @@
                   :customization-color color
                   :type                :empty
                   :on-press            #(rf/dispatch [:wallet/navigate-to-account address])
-                  :loading?            tokens-loading?
+                  :loading?            false
                   :balance             (utils/prettify-balance (get balances address))))
          accounts)))
 
@@ -51,3 +51,4 @@
    (-> wallet
        (get-in [:accounts current-viewing-account-address])
        (assoc :balance (get balances current-viewing-account-address)))))
+

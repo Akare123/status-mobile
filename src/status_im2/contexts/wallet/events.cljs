@@ -1,45 +1,50 @@
 (ns status-im2.contexts.wallet.events
   (:require
-    [camel-snake-kebab.core :as csk]
-    [camel-snake-kebab.extras :as cske]
-    [clojure.string :as string]
-    [native-module.core :as native-module]
-    [quo.foundations.colors :as colors]
-    [react-native.background-timer :as background-timer]
-    [status-im2.common.data-store.wallet :as data-store]
-    [status-im2.contexts.wallet.temp :as temp]
-    [taoensso.timbre :as log]
-    [utils.ethereum.chain :as chain]
-    [utils.i18n :as i18n]
-    [utils.number]
-    [utils.re-frame :as rf]
-    [utils.security.core :as security]
-    [utils.transforms :as types]))
+   [camel-snake-kebab.core :as csk]
+   [camel-snake-kebab.extras :as cske]
+   [clojure.string :as string]
+   [native-module.core :as native-module]
+   [quo.foundations.colors :as colors]
+   [react-native.background-timer :as background-timer]
+   [status-im2.common.data-store.wallet :as data-store]
+   [status-im2.contexts.wallet.temp :as temp]
+   [taoensso.timbre :as log]
+   [utils.ethereum.chain :as chain]
+   [utils.i18n :as i18n]
+   [utils.money]
+   [utils.number]
+   [utils.re-frame :as rf]
+   [utils.security.core :as security]
+   [utils.transforms :as types]
+   [status-im.ui.screens.network.views :as network]
+   [status-im2.contexts.wallet.common.sheets.network-preferences.view :as network-preferences]
+   [status-im2.contexts.quo-preview.wallet.transaction-summary :as transaction-summary]
+   [utils.money :as money]))
 
 (rf/reg-event-fx :wallet/show-account-created-toast
- (fn [{:keys [db]} [address]]
-   (let [{:keys [name]} (get-in db [:wallet :accounts address])]
-     {:db (update db :wallet dissoc :navigate-to-account :new-account?)
-      :fx [[:dispatch
-            [:toasts/upsert
-             {:id         :new-wallet-account-created
-              :icon       :i/correct
-              :icon-color colors/success-50
-              :text       (i18n/label :t/account-created {:name name})}]]]})))
+                 (fn [{:keys [db]} [address]]
+                   (let [{:keys [name]} (get-in db [:wallet :accounts address])]
+                     {:db (update db :wallet dissoc :navigate-to-account :new-account?)
+                      :fx [[:dispatch
+                            [:toasts/upsert
+                             {:id         :new-wallet-account-created
+                              :icon       :i/correct
+                              :icon-color colors/success-50
+                              :text       (i18n/label :t/account-created {:name name})}]]]})))
 
 (rf/reg-event-fx :wallet/navigate-to-account
- (fn [{:keys [db]} [address]]
-   (let [new-account? (get-in db [:wallet :new-account?])]
-     (cond-> {:db (assoc-in db [:wallet :current-viewing-account-address] address)
-              :fx [[:dispatch [:navigate-to :wallet-accounts address]]]}
+                 (fn [{:keys [db]} [address]]
+                   (let [new-account? (get-in db [:wallet :new-account?])]
+                     (cond-> {:db (assoc-in db [:wallet :current-viewing-account-address] address)
+                              :fx [[:dispatch [:navigate-to :wallet-accounts address]]]}
 
-       new-account?
-       (update :fx conj [:dispatch [:wallet/show-account-created-toast address]])))))
+                       new-account?
+                       (update :fx conj [:dispatch [:wallet/show-account-created-toast address]])))))
 
 (rf/reg-event-fx :wallet/close-account-page
- (fn [{:keys [db]}]
-   {:db (update db :wallet dissoc :current-viewing-account-address)
-    :fx [[:dispatch [:navigate-back]]]}))
+                 (fn [{:keys [db]}]
+                   {:db (update db :wallet dissoc :current-viewing-account-address)
+                    :fx [[:dispatch [:navigate-back]]]}))
 
 (rf/reg-event-fx
  :wallet/get-accounts-success
@@ -135,14 +140,14 @@
   {:db (dissoc db :wallet/scanned-address :wallet/send-address)})
 
 (rf/reg-event-fx :wallet/create-derived-addresses
- (fn [{:keys [db]} [password {:keys [path]} on-success]]
-   (let [{:keys [wallet-root-address]} (:profile/profile db)
-         sha3-pwd                      (native-module/sha3 (str (security/safe-unmask-data password)))]
-     {:fx [[:json-rpc/call
-            [{:method     "wallet_getDerivedAddresses"
-              :params     [sha3-pwd wallet-root-address [path]]
-              :on-success on-success
-              :on-error   #(log/info "failed to derive address " %)}]]]})))
+                 (fn [{:keys [db]} [password {:keys [path]} on-success]]
+                   (let [{:keys [wallet-root-address]} (:profile/profile db)
+                         sha3-pwd                      (native-module/sha3 (str (security/safe-unmask-data password)))]
+                     {:fx [[:json-rpc/call
+                            [{:method     "wallet_getDerivedAddresses"
+                              :params     [sha3-pwd wallet-root-address [path]]
+                              :on-success on-success
+                              :on-error   #(log/info "failed to derive address " %)}]]]})))
 
 (rf/reg-event-fx
  :wallet/add-account
@@ -212,8 +217,8 @@
   (let [stored-collectibles      (get-in db [:wallet :collectibles])
         displayable-collectibles (filter displayable-collectible? collectibles)]
     {:db (assoc-in db
-          [:wallet :collectibles]
-          (reduce conj displayable-collectibles stored-collectibles))}))
+                   [:wallet :collectibles]
+                   (reduce conj displayable-collectibles stored-collectibles))}))
 
 (rf/reg-event-fx :wallet/store-collectibles store-collectibles)
 
@@ -247,77 +252,173 @@
                        [])})))
 
 (rf/reg-event-fx :wallet/owned-collectibles-filtering-done
- (fn [_ [{:keys [message]}]]
-   (let [response                               (cske/transform-keys csk/->kebab-case-keyword
-                                                                     (types/json->clj message))
-         {:keys [collectibles has-more offset]} response
-         start-at-index                         (+ offset (count collectibles))]
-     {:fx
-      [[:dispatch [:wallet/store-collectibles collectibles]]
-       (when has-more
-         [:dispatch
-          [:wallet/request-collectibles
-           {:start-at-index start-at-index}]])]})))
+                 (fn [_ [{:keys [message]}]]
+                   (let [response                               (cske/transform-keys csk/->kebab-case-keyword
+                                                                                     (types/json->clj message))
+                         {:keys [collectibles has-more offset]} response
+                         start-at-index                         (+ offset (count collectibles))]
+                     {:fx
+                      [[:dispatch [:wallet/store-collectibles collectibles]]
+                       (when has-more
+                         [:dispatch
+                          [:wallet/request-collectibles
+                           {:start-at-index start-at-index}]])]})))
 
 (rf/reg-event-fx :wallet/fetch-address-suggestions
- (fn [{:keys [db]} [address]]
-   {:db (assoc db
-               :wallet/local-suggestions
-               (cond
-                 (= address
-                    (get-in
-                     temp/address-local-suggestion-saved-contact-address-mock
-                     [:accounts 0 :address]))
-                 [temp/address-local-suggestion-saved-contact-address-mock]
-                 (= address
-                    (get temp/address-local-suggestion-saved-address-mock
-                         :address))
-                 [temp/address-local-suggestion-saved-address-mock]
-                 :else (temp/find-matching-addresses address))
-               :wallet/valid-ens-or-address?
-               false)}))
+                 (fn [{:keys [db]} [address]]
+                   {:db (assoc db
+                               :wallet/local-suggestions
+                               (cond
+                                 (= address
+                                    (get-in
+                                     temp/address-local-suggestion-saved-contact-address-mock
+                                     [:accounts 0 :address]))
+                                 [temp/address-local-suggestion-saved-contact-address-mock]
+                                 (= address
+                                    (get temp/address-local-suggestion-saved-address-mock
+                                         :address))
+                                 [temp/address-local-suggestion-saved-address-mock]
+                                 :else (temp/find-matching-addresses address))
+                               :wallet/valid-ens-or-address?
+                               false)}))
 
 (rf/reg-event-fx :wallet/ens-validation-success
- (fn [{:keys [db]} [ens]]
-   {:db (assoc db
-               :wallet/local-suggestions     (if (= ens
-                                                    (:ens temp/ens-local-suggestion-saved-address-mock))
-                                               [temp/ens-local-suggestion-saved-address-mock]
-                                               [temp/ens-local-suggestion-mock])
-               :wallet/valid-ens-or-address? true)}))
+                 (fn [{:keys [db]} [ens]]
+                   {:db (assoc db
+                               :wallet/local-suggestions     (if (= ens
+                                                                    (:ens temp/ens-local-suggestion-saved-address-mock))
+                                                               [temp/ens-local-suggestion-saved-address-mock]
+                                                               [temp/ens-local-suggestion-mock])
+                               :wallet/valid-ens-or-address? true)}))
 
 (rf/reg-event-fx :wallet/address-validation-success
- (fn [{:keys [db]} [_]]
-   {:db (assoc db :wallet/valid-ens-or-address? true)}))
+                 (fn [{:keys [db]} [_]]
+                   {:db (assoc db :wallet/valid-ens-or-address? true)}))
 
 (rf/reg-event-fx :wallet/validate-address
- (fn [{:keys [db]} [address]]
-   (let [current-timeout (get db :wallet/search-timeout)
-         timeout         (background-timer/set-timeout
-                          #(rf/dispatch [:wallet/address-validation-success address])
-                          2000)]
-     (background-timer/clear-timeout current-timeout)
-     {:db (assoc db
-                 :wallet/valid-ens-or-address? false
-                 :wallet/search-timeout        timeout)})))
+                 (fn [{:keys [db]} [address]]
+                   (let [current-timeout (get db :wallet/search-timeout)
+                         timeout         (background-timer/set-timeout
+                                          #(rf/dispatch [:wallet/address-validation-success address])
+                                          2000)]
+                     (background-timer/clear-timeout current-timeout)
+                     {:db (assoc db
+                                 :wallet/valid-ens-or-address? false
+                                 :wallet/search-timeout        timeout)})))
 
 (rf/reg-event-fx :wallet/validate-ens
- (fn [{:keys [db]} [ens]]
-   (let [current-timeout (get db :wallet/search-timeout)
-         timeout         (background-timer/set-timeout
-                          #(rf/dispatch [:wallet/ens-validation-success ens])
-                          2000)]
-     (background-timer/clear-timeout current-timeout)
-     {:db (assoc db
-                 :wallet/valid-ens-or-address? false
-                 :wallet/search-timeout        timeout)})))
+                 (fn [{:keys [db]} [ens]]
+                   (let [current-timeout (get db :wallet/search-timeout)
+                         timeout         (background-timer/set-timeout
+                                          #(rf/dispatch [:wallet/ens-validation-success ens])
+                                          2000)]
+                     (background-timer/clear-timeout current-timeout)
+                     {:db (assoc db
+                                 :wallet/valid-ens-or-address? false
+                                 :wallet/search-timeout        timeout)})))
 
 (rf/reg-event-fx :wallet/clean-local-suggestions
- (fn [{:keys [db]}]
-   (let [current-timeout (get db :wallet/search-timeout)]
-     (background-timer/clear-timeout current-timeout)
-     {:db (assoc db :wallet/local-suggestions [] :wallet/valid-ens-or-address? false)})))
+                 (fn [{:keys [db]}]
+                   (let [current-timeout (get db :wallet/search-timeout)]
+                     (background-timer/clear-timeout current-timeout)
+                     {:db (assoc db :wallet/local-suggestions [] :wallet/valid-ens-or-address? false)})))
 
 (rf/reg-event-fx :wallet/select-send-address
- (fn [{:keys [db]} [address]]
-   {:db (assoc db :wallet/send-address address)}))
+                 (fn [{:keys [db]} [address]]
+                   {:db (assoc db :wallet/send-address address)}))
+
+(rf/reg-event-fx :wallet/get-suggested-routes
+                 (fn [{:keys [db]} {:keys []}]
+                   (let [wallet-address (get-in db [:wallet :current-viewing-account-address])
+                         tokens (get-in db [:wallet  :accounts])
+                         account (get-in db [:wallet :accounts wallet-address])
+                         token-decimal 18
+                         token-id "ETH"
+                         value_ 0.005
+                         network-preferences [5]
+                         gas-rates 0 ;low
+                         amount-in (utils.money/mul (utils.money/bignumber value_) (utils.money/from-decimal token-decimal))
+                         from-address wallet-address
+                         to-address wallet-address
+                         request-params [0
+                                         from-address
+                                         to-address
+                                         (utils.money/to-hex amount-in)
+                                         token-id
+                                         []
+                                         []
+                                         network-preferences
+                                         gas-rates
+                                         {}]]
+
+                     {:json-rpc/call [{:method     "wallet_getSuggestedRoutes"
+                                       :params     request-params
+                                       :on-success #(rf/dispatch [:wallet/send-transaction % from-address to-address])
+                                       :on-error   (fn [error]
+                                                     (log/error "failed to get suggested routes"
+                                                                {:event  :wallet/get-suggested-routes
+                                                                 :error  error
+                                                                 :params request-params}))}]})))
+
+(rf/reg-event-fx :wallet/send-transaction
+                 (fn [{:keys [db]} [transaction from-address to-address]]
+                   (let [best (first (:Best transaction))
+                         from (:From best)
+                         to (:To best)
+                         from-asset (:nativeCurrencySymbol from)
+                         to-asset (:nativeCurrencySymbol to)
+                         bridge-name (:BridgeName best)
+                         chain-id (:chainId from)
+                         multi-transaction-command {:from-address from-address
+                                                    :to-address to-address
+                                                    :from-asset from-asset
+                                                    :to-asset to-asset
+                                                    :from-amount  (:AmountOut best)
+                                                    :type 0}
+
+                         transaction-bridge
+                         [{:BridgeName bridge-name
+                           :ChainID chain-id
+                           :TransferTx {:From from-address
+                                        :To to-address
+                                        :Gas (money/to-hex (:GasAmount best))
+                                        :GasPrice (money/to-hex (money/->wei :gwei (:gasPrice (:GasFees best))))
+                                        :Value (:AmountOut best)
+                                        :Nonce nil
+                                        :MaxFeePerGas (money/to-hex (money/->wei :gwei (:maxFeePerGasMedium (:GasFees best))))
+                                        :MaxPriorityFeePerGas  (money/to-hex (money/->wei :gwei (:maxPriorityFeePerGas (:GasFees best))))
+                                        :Input ""
+                                        :Data "0x"}}]
+                         sha3-pwd                      (native-module/sha3 (str (security/safe-unmask-data "mmmmmmmmmm")))
+                         request-params [multi-transaction-command transaction-bridge sha3-pwd]]
+                     (prn  "=====" request-params)
+                     {:json-rpc/call [{:method     "wallet_createMultiTransaction"
+                                       :params     request-params
+                                       :on-success #(prn % "======+++++++++========++++++++")
+                                       :on-error   (fn [error]
+                                                     (log/error "failed to send transaction"
+                                                                {:event  :wallet/send-transaction
+                                                                 :error  error
+                                                                 :params request-params}))}]})))
+
+
+[{:from-address "0x5ffa75ce51c3a7ebe23bde37b5e3a0143dfbcee0",
+  :to-address "0x5ffa75ce51c3a7ebe23bde37b5e3a0143dfbcee0",
+  :from-asset "ETH",
+  :to-asset "ETH",
+  :from-amount "0x11c37937e08000",
+  :type 0}
+
+ [{:BridgeName "Transfer",
+   :ChainID 5,
+   :TransferTx {:MaxFeePerGas "0x3b9aca00",
+                :From "0x5ffa75ce51c3a7ebe23bde37b5e3a0143dfbcee0",
+                :MaxPriorityFeePerGas "0x5f5e100",
+                :Gas "0x5bbf",
+                :Input "",
+                :Data "",
+                :GasPrice "0x5f5e108",
+                :Nonce nil,
+                :Value "0x11c37937e08000",
+                :To "0x5ffa75ce51c3a7ebe23bde37b5e3a0143dfbcee0"}}]
+ "0x46484c15b50121d38bc5811f4b09ae60fc95a7c8b4d913105a3085fcadcb967e"]

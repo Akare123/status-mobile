@@ -1,21 +1,25 @@
 (ns status-im2.contexts.profile.profiles.view
   (:require
-    [native-module.core :as native-module]
-    [quo.core :as quo]
-    [react-native.core :as rn]
-    [react-native.reanimated :as reanimated]
-    [react-native.safe-area :as safe-area]
-    [reagent.core :as reagent]
-    [status-im2.common.confirmation-drawer.view :as confirmation-drawer]
-    [status-im2.common.standard-authentication.password-input.view :as password-input]
-    [status-im2.config :as config]
-    [status-im2.constants :as constants]
-    [status-im2.contexts.onboarding.common.background.view :as background]
-    [status-im2.contexts.profile.profiles.style :as style]
-    [taoensso.timbre :as log]
-    [utils.i18n :as i18n]
-    [utils.re-frame :as rf]
-    [utils.transforms :as transforms]))
+   ["rive-react-native" :as Rive]
+   [native-module.core :as native-module]
+   [quo.core :as quo]
+   [react-native.core :as rn]
+   [react-native.reanimated :as reanimated]
+   [react-native.safe-area :as safe-area]
+   [reagent.core :as reagent]
+   [status-im2.common.confirmation-drawer.view :as confirmation-drawer]
+   [status-im2.common.standard-authentication.password-input.view :as password-input]
+   [status-im2.config :as config]
+   [status-im2.constants :as constants]
+   [status-im2.contexts.onboarding.common.background.view :as background]
+   [status-im2.contexts.profile.profiles.style :as style]
+   [taoensso.timbre :as log]
+   [utils.i18n :as i18n]
+   [utils.re-frame :as rf]
+   [utils.transforms :as transforms]
+   [oops.core :as oops]))
+
+(def x (js/require "../resources/videos2/pig.riv"))
 
 (defonce push-animation-fn-atom (atom nil))
 (defonce pop-animation-fn-atom (atom nil))
@@ -222,13 +226,37 @@
 ;; we had to register it here, because of hotreload, overwise on hotreload it will be reseted
 (defonce show-profiles? (reagent/atom false))
 
-(defn view
+(def rive (reagent/adapt-react-class (.-default Rive)))
+
+(defn v
   []
   (let [set-show-profiles #(reset! show-profiles? true)
         set-hide-profiles #(reset! show-profiles? false)]
     (fn []
-      [:<>
-       [background/view true]
-       (if @show-profiles?
-         [profiles-section {:set-hide-profiles set-hide-profiles}]
-         [login-section {:set-show-profiles set-show-profiles}])])))
+      (let [r (rn/use-ref)]
+        (prn x)
+        [rn/view {:style {:flex 1
+                          :margin-top 40}}
+         [rive {:artboardName "Av"
+                ;; :riveRef r
+                :resourceName x
+                :autoplay true
+                :fit (oops/oget Rive "Fit.Contain")
+              ;; :alignment (oops/oget Rive "Alignment.Center")
+                :stateMachineName "av"
+                :style {:width 390
+                        :z-index 50
+                        :background-color :green
+                        :border-width 1
+                        :border-color :red
+                        :height 380}}]
+         [quo/button {:on-press #()} "play"]
+
+
+         #_[background/view true]
+         #_(if @show-profiles?
+             [profiles-section {:set-hide-profiles set-hide-profiles}]
+             [login-section {:set-show-profiles set-show-profiles}])]))))
+
+(defn view []
+  [:f> v ])

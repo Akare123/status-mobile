@@ -14,6 +14,8 @@ module.exports = {
     }),
   },
   resolver: {
+    assetExts: ['png', 'riv', 'jpg', 'mp4'],
+
     extraNodeModules: require('node-libs-react-native'),
   },
 };

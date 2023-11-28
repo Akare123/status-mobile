@@ -359,6 +359,10 @@ PODS:
     - React-Core
     - React-RCTImage
     - React-RCTText
+  - rive-react-native (6.1.1):
+    - React-Core
+    - RiveRuntime (= 5.3.1)
+  - RiveRuntime (5.3.1)
   - RNCAsyncStorage (1.17.9):
     - React-Core
   - RNCClipboard (1.2.2):
@@ -497,6 +501,7 @@ DEPENDENCIES:
   - "ReactNativeAudioToolkit (from `../node_modules/@react-native-community/audio-toolkit`)"
   - ReactNativeCameraKit (from `../node_modules/react-native-camera-kit`)
   - ReactNativeNavigation (from `../node_modules/react-native-navigation`)
+  - rive-react-native (from `../node_modules/rive-react-native`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCClipboard (from `../node_modules/@react-native-community/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
@@ -525,6 +530,7 @@ SPEC REPOS:
     - fmt
     - HMSegmentedControl
     - libwebp
+    - RiveRuntime
     - SDWebImage
     - SDWebImageWebPCoder
     - SSZipArchive
@@ -641,6 +647,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-camera-kit"
   ReactNativeNavigation:
     :path: "../node_modules/react-native-navigation"
+  rive-react-native:
+    :path: "../node_modules/rive-react-native"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCClipboard:
@@ -752,6 +760,8 @@ SPEC CHECKSUMS:
   ReactNativeAudioToolkit: de9610f323e855ac6574be8c99621f3d57c5df06
   ReactNativeCameraKit: d95d3e19c514526a234d9f93c6db7e7f10eef9ea
   ReactNativeNavigation: 94979dd1572a3f093fc85d4599360530a1bed8c8
+  rive-react-native: 08eb103dff9217fc921e1bcd32527603d87fa933
+  RiveRuntime: 63fe0407ab96ab1796c492d1e584a3b766e80693
   RNCAsyncStorage: b2489b49e38c85e10ed45a888d13a2a4c7b32ea1
   RNCClipboard: 8148e21ac347c51fd6cd4b683389094c216bb543
   RNCMaskedView: 71fc32d971f03b7f03d6ab6b86b730c4ee64f5b6
@@ -765,7 +775,7 @@ SPEC CHECKSUMS:
   RNLanguages: 962e562af0d34ab1958d89bcfdb64fafc37c513e
   RNPermissions: ad71dd4f767ec254f2cd57592fbee02afee75467
   RNReactNativeHapticFeedback: 2566b468cc8d0e7bb2f84b23adc0f4614594d071
-  RNReanimated: 42f56dc5c032a11177b9ea12cdb57285318b432e
+  RNReanimated: 62e43ee6baafb9ba3d3af1857d7fd23a1d41bff0
   RNShare: d82e10f6b7677f4b0048c23709bd04098d5aee6c
   RNStaticSafeAreaInsets: 055ddbf5e476321720457cdaeec0ff2ba40ec1b8
   RNSVG: 80584470ff1ffc7994923ea135a3e5ad825546b9
@@ -777,6 +787,6 @@ SPEC CHECKSUMS:
   TouchID: ba4c656d849cceabc2e4eef722dea5e55959ecf4
   Yoga: d24d6184b6b85f742536bd93bd07d69d7b9bb4c1
 
-PODFILE CHECKSUM: 84b749023e1c988c133d7a6ec09d125536e4a4fd
+PODFILE CHECKSUM: 212407e4d10b852641721f6de7b30684c95c0429
 
 COCOAPODS: 1.12.0

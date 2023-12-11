@@ -10,8 +10,8 @@
   (rf/merge cofx
             {:copy-to-clipboard text-to-copy}
             (toasts/upsert
-             {:icon           :correct
-              :id             :successful-copy-toast-message
-              :icon-color     colors/success-50
-              :override-theme :dark
-              :text           post-copy-message})))
+             {:icon       :correct
+              :id         :successful-copy-toast-message
+              :icon-color colors/success-50
+              :theme      :dark
+              :text       post-copy-message})))

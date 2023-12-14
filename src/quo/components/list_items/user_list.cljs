@@ -56,10 +56,11 @@
       :secondary-name secondary-name
       :contact?       contact?
       :verified?      verified?
-      :untrustworthy? untrustworthy?}]
+      :untrustworthy? untrustworthy?
+      :size           15}]
     (when short-chat-key
       [text/text
-       {:size  :paragraph-1
+       {:size  :paragraph-2
         :style {:color (colors/theme-colors colors/neutral-50 colors/neutral-40)}}
        short-chat-key])]
    (when accessory

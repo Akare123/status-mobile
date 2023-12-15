@@ -1,4 +1,4 @@
-(ns quo.components.list-items.user-list
+(ns quo.components.list-items.user
   (:require
     [quo.components.avatars.user-avatar.view :as user-avatar]
     [quo.components.icon :as icons]
@@ -37,7 +37,7 @@
      [text/text "not implemented"]
      [rn/view])])
 
-(defn user-list
+(defn user
   [{:keys [short-chat-key primary-name secondary-name photo-path online? contact? verified?
            untrustworthy? on-press on-long-press accessory]}]
   [rn/touchable-opacity

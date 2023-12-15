@@ -83,7 +83,7 @@
     quo.components.list-items.saved-contact-address.view
     quo.components.list-items.token-network.view
     quo.components.list-items.token-value.view
-    quo.components.list-items.user-list
+    quo.components.list-items.user
     quo.components.loaders.skeleton-list.view
     quo.components.markdown.list.view
     quo.components.markdown.text
@@ -293,7 +293,7 @@
 (def dapp quo.components.list-items.dapp.view/view)
 (def menu-item quo.components.list-items.menu-item/menu-item)
 (def preview-list quo.components.list-items.preview-list.view/view)
-(def user-list quo.components.list-items.user-list/user-list)
+(def user quo.components.list-items.user/user)
 (def community-list-item quo.components.list-items.community.view/view)
 (def saved-address quo.components.list-items.saved-address.view/view)
 (def saved-contact-address quo.components.list-items.saved-contact-address.view/view)

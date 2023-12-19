@@ -2444,5 +2444,7 @@
     "transacation-finalised": "Transaction finalised!",
     "no-relevant-tokens": "No relevant tokens",
     "from-label": "From",
-    "to-label": "To"
+    "to-label": "To",
+    "time-in-mins": "{{minutes}} min",
+    "amount-with-currency-symbol": "{{symbol}} {{amount}}"
 }

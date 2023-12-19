@@ -1,18 +1,17 @@
 (ns status-im2.contexts.profile.login.events
   (:require
+    [legacy.status-im.browser.core :as browser]
+    [legacy.status-im.data-store.chats :as data-store.chats]
+    [legacy.status-im.data-store.settings :as data-store.settings]
+    [legacy.status-im.data-store.switcher-cards :as switcher-cards-store]
+    [legacy.status-im.data-store.visibility-status-updates :as visibility-status-updates-store]
+    [legacy.status-im.group-chats.core :as group-chats]
+    [legacy.status-im.mailserver.core :as mailserver]
+    [legacy.status-im.mobile-sync-settings.core :as mobile-network]
+    [legacy.status-im.pairing.core :as pairing]
+    [legacy.status-im.stickers.core :as stickers]
     [native-module.core :as native-module]
     [re-frame.core :as re-frame]
-    [status-im.browser.core :as browser]
-    [status-im.communities.core :as communities]
-    [status-im.data-store.chats :as data-store.chats]
-    [status-im.data-store.settings :as data-store.settings]
-    [status-im.data-store.switcher-cards :as switcher-cards-store]
-    [status-im.data-store.visibility-status-updates :as visibility-status-updates-store]
-    [status-im.group-chats.core :as group-chats]
-    [status-im.mailserver.core :as mailserver]
-    [status-im.mobile-sync-settings.core :as mobile-network]
-    [status-im.pairing.core :as pairing]
-    [status-im.stickers.core :as stickers]
     [status-im2.common.keychain.events :as keychain]
     [status-im2.common.log :as logging]
     [status-im2.common.universal-links :as universal-links]
@@ -93,7 +92,8 @@
                               :profile/profile          (merge profile-overview settings))
                        (assoc-in [:wallet :ui :tokens-loading?] true))
                :fx [[:dispatch [:wallet/get-ethereum-chains]]
-                    [:dispatch [:universal-links/generate-profile-url]]]}
+                    [:dispatch [:universal-links/generate-profile-url]]
+                    [:dispatch [:community/fetch]]]}
               (notifications/load-preferences)
               (data-store.chats/fetch-chats-preview
                {:on-success
@@ -101,9 +101,6 @@
                      (rf/dispatch [:communities/get-user-requests-to-join])
                      (re-frame/dispatch [:profile.login/get-chats-callback]))})
               (profile.config/get-node-config)
-              (communities/fetch)
-              (communities/fetch-collapsed-community-categories)
-              (communities/check-and-delete-pending-request-to-join)
               (logging/set-log-level (:log-level settings))
               (activity-center/notifications-fetch-pending-contact-requests)
               (activity-center/update-seen-state)

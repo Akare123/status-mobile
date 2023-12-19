@@ -25,6 +25,13 @@
     [status-im2.contexts.chat.composer.utils :as utils]
     [utils.i18n :as i18n]))
 
+(defn- scroll-to-end
+  [props]
+  ;; Needs to be queued, Otherwise might not be called on the right time.
+  (js/setTimeout #(when-let [ref @(:composer-scrollview-ref props)]
+                    (.scrollToEnd ref #js {:animated :true}))
+                 10))
+
 (defn sheet-component
   [{:keys [insets
            scroll-to-bottom-fn
@@ -67,13 +74,7 @@
         ;; Cursor position, needed to determine where to display the mentions view
         cursor-pos               (utils/cursor-y-position-relative-to-container
                                   props
-                                  state)
-        scroll-to-end            (fn []
-                                   ;; Needs to be queued, Otherwise might not be called on the right
-                                   ;; time.
-                                   (js/setTimeout #(when @(:composer-scrollview-ref props)
-                                                     (.scrollToEnd @(:composer-scrollview-ref props)))
-                                                  50))]
+                                  state)]
     (effects/did-mount props)
     (effects/initialize props
                         state
@@ -134,7 +135,7 @@
              :on-blur #(handler/blur state animations dimensions subscriptions)
              :on-change-text #(handler/change-text % props state scroll-to-end)
              :on-selection-change #(handler/selection-change % props state)
-             :on-content-size-change #(handler/content-size-change %1
+             :on-content-size-change #(handler/content-size-change %
                                                                    state
                                                                    animations
                                                                    dimensions

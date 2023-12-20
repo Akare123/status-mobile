@@ -12,6 +12,8 @@ stdenv.mkDerivation {
     "patchBuildIdPhase"
     "patchKeyChainPhase"
     "patchGlogPhase"
+    "patchJestPhase"
+    "patchKeyCardPhase"
     "installPhase"
   ];
 
@@ -75,6 +77,16 @@ stdenv.mkDerivation {
     substituteInPlace ./node_modules/react-native/scripts/ios-configure-glog.sh \
     --replace 'export CC="' '#export CC="' \
     --replace 'export CXX="' '#export CXX="'
+  '';
+
+  # fix ios build issue with Keycard setting a low ios deployment version.
+  patchKeyCardPhase = ''
+    substituteInPlace ./node_modules/react-native-status-keycard/react-native-status-keycard.podspec \
+    --replace ' s.platforms    = { :ios => "10.0" }' ' s.platforms    = { :ios => "12.0" }'
+
+    substituteInPlace ./node_modules/react-native-status-keycard/ios/StatusKeycard.xcodeproj/project.pbxproj \
+    --replace 'IPHONEOS_DEPLOYMENT_TARGET = 8.0;' 'IPHONEOS_DEPLOYMENT_TARGET = 12.0;'
+
   '';
 
   # The ELF types are incompatible with the host platform, so let's not even try

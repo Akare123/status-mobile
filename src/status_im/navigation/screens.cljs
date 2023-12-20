@@ -31,6 +31,7 @@
     [status-im.contexts.onboarding.syncing.progress.view :as syncing-devices]
     [status-im.contexts.onboarding.syncing.results.view :as syncing-results]
     [status-im.contexts.onboarding.welcome.view :as welcome]
+    [status-im.contexts.profile.edit.view :as edit-profile]
     [status-im.contexts.profile.profiles.view :as profiles]
     [status-im.contexts.profile.settings.view :as settings]
     [status-im.contexts.quo-preview.component-preview.view :as component-preview]
@@ -164,6 +165,10 @@
                  :layout options/onboarding-layout}
      :on-focus  [:onboarding/overlay-dismiss]
      :component profiles/view}
+
+    {:name      :edit-profile
+     :options   options/transparent-screen-options
+     :component edit-profile/view}
 
     {:name      :new-to-status
      :options   {:theme                  :dark

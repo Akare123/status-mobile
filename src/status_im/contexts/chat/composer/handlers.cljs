@@ -16,7 +16,7 @@
 (defn focus
   "Animate to the `saved-height`, display background-overlay if needed, and set cursor position"
   [{:keys [input-ref] :as props}
-   {:keys [text-value focused? lock-selection? saved-cursor-position]}
+   {:keys [text-value focused? lock-selection? saved-cursor-position maximized?]}
    {:keys [height saved-height last-height opacity background-y container-opacity]
     :as   animations}
    {:keys [max-height] :as dimensions}
@@ -29,6 +29,7 @@
     (reanimated/set-shared-value saved-height new-height)
     (reanimated/animate container-opacity 1)
     (when (> last-height-value (* constants/background-threshold max-height))
+      (reset! maximized? true)
       (reanimated/animate opacity 1)
       (reanimated/set-shared-value background-y 0)))
 
@@ -42,7 +43,7 @@
 (defn blur
   "Save the current height, minimize the composer, animate-out the background, and save cursor position"
   [{:keys [text-value focused? lock-selection? cursor-position saved-cursor-position gradient-z-index
-           maximized? recording?]}
+           maximized? recording? minimized?]}
    {:keys [height saved-height last-height gradient-opacity container-opacity opacity background-y]}
    {:keys [content-height max-height window-height]}
    {:keys [images link-previews? reply]}]

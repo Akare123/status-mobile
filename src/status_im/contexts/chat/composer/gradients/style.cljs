@@ -31,13 +31,14 @@
    :position :absolute
    :bottom   0
    :left     0
-   :right    0
-   :z-index  2})
+   :right    0})
 
 (defn bottom-gradient
   []
-  {:colors [(colors/theme-colors colors/white colors/neutral-95)
-            (colors/theme-colors colors/white-opa-0 colors/neutral-95-opa-0)]
-   :start  {:x 0 :y 1}
-   :end    {:x 0 :y 0}
-   :style  bottom-gradient-style})
+  {:colors    [(colors/theme-colors colors/white-opa-90 colors/neutral-95-opa-60)
+               (colors/theme-colors colors/white-opa-30 colors/neutral-95-opa-0)
+              ]
+   :start     {:x 0 :y 1}
+   :end       {:x 0 :y 0}
+   :locations [0.3 1]
+   :style     bottom-gradient-style})

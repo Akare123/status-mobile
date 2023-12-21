@@ -43,7 +43,7 @@
 (defn blur
   "Save the current height, minimize the composer, animate-out the background, and save cursor position"
   [{:keys [text-value focused? lock-selection? cursor-position saved-cursor-position gradient-z-index
-           maximized? recording? minimized?]}
+           maximized? recording?]}
    {:keys [height saved-height last-height gradient-opacity container-opacity opacity background-y]}
    {:keys [content-height max-height window-height]}
    {:keys [images link-previews? reply]}]

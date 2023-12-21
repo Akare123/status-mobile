@@ -17,7 +17,7 @@
   [{:keys [text-value saved-cursor-position maximized?]}
    {:keys [content-height]}
    {:keys [input-content-height input-text input-maximized?]}
-   {:keys [height last-height saved-height]}]
+   {:keys [height]}]
   (let [lines            (utils/calc-lines input-content-height)
         minimized-height (if (or (= lines 1) (empty? input-text))
                            constants/input-height
@@ -26,9 +26,7 @@
       (reset! text-value input-text)
       (reset! content-height input-content-height)
       (reset! saved-cursor-position (count input-text))
-      (reanimated/set-shared-value height minimized-height)
-      (reanimated/set-shared-value last-height input-content-height)
-      (reanimated/set-shared-value saved-height input-content-height))
+      (reanimated/set-shared-value height minimized-height))
     (when input-maximized?
       (reset! maximized? true))))
 

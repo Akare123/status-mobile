@@ -25,6 +25,7 @@
     status-im.contexts.syncing.events
     status-im.contexts.wallet.events
     status-im.contexts.wallet.send.events
+    status-im.contexts.wallet.signals
     [status-im.db :as db]
     [utils.re-frame :as rf]))
 

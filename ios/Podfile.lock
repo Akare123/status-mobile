@@ -910,7 +910,7 @@ PODS:
     - React
   - react-native-transparent-video (0.1.0):
     - React-Core
-  - react-native-webview (13.3.1):
+  - react-native-webview (13.6.3):
     - React-Core
   - React-nativeconfig (0.73.1)
   - React-NativeModulesApple (0.73.1):
@@ -1501,7 +1501,7 @@ SPEC CHECKSUMS:
   react-native-status: 21f75d492fd311dc111303da38a7a2b23a8a8466
   react-native-status-keycard: dd7d984f34f19b041d3a3e3b3fd05758651730bd
   react-native-transparent-video: e484ad11ace8e5f62516e2c5e15efd3cb4df24b0
-  react-native-webview: c2b70afb1d910cdd8810375aecc6c2894e2ba061
+  react-native-webview: 88293a0f23eca8465c0433c023ec632930e644d0
   React-nativeconfig: 37aecd26d64b79327c3f10e43b2e9a6c425e0a60
   React-NativeModulesApple: 00e8c36b6c56ce76af5e52e07d5ecaad18038d51
   React-perflogger: 5ffc4d6ccb74eaac7b8b2867e58a447232483d6d

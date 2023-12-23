@@ -35,21 +35,6 @@ buildscript {
 
 apply plugin: "com.facebook.react.rootproject"
 
-subprojects {
-    afterEvaluate {
-        if (project.hasProperty("android")) {
-            android {
-                compileSdkVersion rootProject.ext.compileSdkVersion
-                buildToolsVersion rootProject.ext.buildToolsVersion
-
-                defaultConfig {
-                    targetSdkVersion rootProject.ext.targetSdkVersion
-                }
-            }
-        }
-    }
-}
-
 allprojects {
     beforeEvaluate {
         if (System.env.STATUS_GO_ANDROID_LIBDIR == null || System.env.STATUS_GO_ANDROID_LIBDIR == "") {

@@ -80,6 +80,7 @@
     [status-im.contexts.quo-preview.inputs.title-input :as title-input]
     [status-im.contexts.quo-preview.ios.drawer-bar :as drawer-bar]
     [status-im.contexts.quo-preview.keycard.keycard :as keycard]
+    [status-im.contexts.quo-preview.links.internal-link-card :as internal-link-card]
     [status-im.contexts.quo-preview.links.link-preview :as link-preview]
     [status-im.contexts.quo-preview.links.url-preview :as url-preview]
     [status-im.contexts.quo-preview.links.url-preview-list :as
@@ -321,7 +322,10 @@
                         :component keyboard-key/view}
                        {:name      :numbered-keyboard
                         :component numbered-keyboard/view}]
-   :links             [{:name      :url-preview
+   :links             [{:name      :internal-link-card
+                        :options   {:insets {:top true}}
+                        :component internal-link-card/view}
+                       {:name      :url-preview
                         :options   {:insets {:top? true}}
                         :component url-preview/view}
                        {:name      :url-preview-list

@@ -8,17 +8,15 @@
 
 (defn- account-item
   [item]
-  [rn/view
-   {:style style/account-item-container}
-   [quo/account-avatar (assoc item :size 32)]
-   [rn/view
-    [quo/text
-     {:size   :paragraph-1
-      :weight :semi-bold}
-     (:name item)]
-    [quo/address-text
-     {:address (:address item)
-      :format  :short}]]])
+  [quo/account-permissions
+   {:account         {:name                (:name item)
+                      :address             (:address item)
+                      :emoji               (:emoji item)
+                      :customization-color (:customization-color item)}
+    :token-details   []
+    :checked?        true
+    :on-change       not-implemented/alert
+    :container-style {:margin-bottom 8}}])
 
 (defn view
   []

@@ -10,6 +10,7 @@
     [status-im.contexts.wallet.common.utils :as utils]
     [status-im.contexts.wallet.send.input-amount.style :as style]
     [status-im.contexts.wallet.send.routes.view :as routes]
+    [utils.address :as address]
     [utils.debounce :as debounce]
     [utils.i18n :as i18n]
     [utils.re-frame :as rf]))
@@ -50,11 +51,48 @@
     (normalize-input current v)
     current))
 
+(defn- estimated-fees
+  [{:keys [loading-suggested-routes? fees native-currency-symbol amount receiver]}]
+  [rn/view {:style style/estimated-fees-container}
+   [rn/view {:style style/estimated-fees-content-container}
+    [quo/button
+     {:icon-only?          true
+      :type                :outline
+      :size                32
+      :inner-style         {:opacity 1}
+      :accessibility-label :advanced-button
+      :disabled?           loading-suggested-routes?
+      :on-press            #(js/alert "Not implemented yet")}
+     :i/advanced]]
+   [quo/data-item
+    {:container-style style/fees-data-item
+     :blur?           false
+     :description     :default
+     :icon-right?     false
+     :card?           false
+     :label           :none
+     :status          (if loading-suggested-routes? :loading :default)
+     :size            :small
+     :title           (i18n/label :t/fees)
+     :subtitle        (str fees " " native-currency-symbol)}]
+   [quo/data-item
+    {:container-style style/amount-data-item
+     :blur?           false
+     :description     :default
+     :icon-right?     false
+     :card?           false
+     :label           :none
+     :status          (if loading-suggested-routes? :loading :default)
+     :size            :small
+     :title           (i18n/label :t/user-gets {:name receiver})
+     :subtitle        amount}]])
+
 (defn- f-view-internal
   [{:keys [rate limit]}]
   (let [bottom                    (safe-area/get-bottom)
         {:keys [currency]}        (rf/sub [:profile/profile])
         networks                  (rf/sub [:wallet/network-details])
+        to-address                (rf/sub [:wallet/wallet-send-to-address])
         token                     (rf/sub [:wallet/wallet-send-token])
         loading-suggested-routes? (rf/sub [:wallet/wallet-send-loading-suggested-routes?])
         token-symbol              (:symbol token)
@@ -108,7 +146,10 @@
                                        (> input-num-value (:amount @current-limit)))
             from-network              (utils/id->network (get-in route [:From :chainId]))
             to-network                (utils/id->network (get-in route [:To :chainId]))
-            amount                    (str @input-value " " token-symbol)]
+            amount                    (str @input-value " " token-symbol)
+            fees                      (when-not confirm-disabled? (utils/calculate-gas-fee route))
+            native-currency-symbol    (when-not confirm-disabled?
+                                        (get-in route [:From :nativeCurrencySymbol]))]
         (rn/use-effect
          (fn []
            (let [dismiss-keyboard-fn   #(when (= % "active") (rn/dismiss-keyboard!))
@@ -155,6 +196,13 @@
                   :to-network   to-network}]
                 (and (not loading-suggested-routes?) (nil? route))
                 [quo/text "Route not found"])]
+         (when (or loading-suggested-routes? route)
+           [estimated-fees
+            {:loading-suggested-routes? loading-suggested-routes?
+             :fees                      fees
+             :native-currency-symbol    native-currency-symbol
+             :amount                    amount
+             :receiver                  (address/get-shortened-key to-address)}])
          [quo/bottom-actions
           {:actions          :1-action
            :button-one-label (i18n/label :t/confirm)

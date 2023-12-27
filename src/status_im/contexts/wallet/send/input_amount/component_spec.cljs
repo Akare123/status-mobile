@@ -39,9 +39,17 @@
                                                   :mixedcase-address "0x7bcDfc75c431"
                                                   :public-key "0x04371e2d9d66b82f056bc128064"
                                                   :removed false}
+   :wallet/wallet-send-to-address                "0x04371e2d9d66b82f056bc128064"
    :wallet/wallet-send-token                     {:symbol :eth}
    :wallet/wallet-send-loading-suggested-routes? false
-   :wallet/wallet-send-route                     {:route []}})
+   :wallet/wallet-send-route                     {:From      {:chainId              1
+                                                              :nativeCurrencySymbol "ETH"}
+                                                  :To        {:chainId              1
+                                                              :nativeCurrencySymbol "ETH"}
+                                                  :GasAmount "23487"
+                                                  :GasFees   {:baseFee              "32.325296406"
+                                                              :maxPriorityFeePerGas "0.011000001"
+                                                              :eip1559Enabled       true}}})
 
 (h/describe "Send > input amount screen"
   (h/setup-restorable-re-frame)

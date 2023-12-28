@@ -12,7 +12,6 @@ stdenv.mkDerivation {
     "patchBuildIdPhase"
     "patchKeyChainPhase"
     "patchGlogPhase"
-    "patchJestPhase"
     "patchKeyCardPhase"
     "installPhase"
   ];

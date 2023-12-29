@@ -8,6 +8,7 @@
     [reagent.core :as reagent]
     [status-im.contexts.wallet.common.account-switcher.view :as account-switcher]
     [status-im.contexts.wallet.common.utils :as utils]
+    [status-im.contexts.wallet.common.utils.send :as send-utils]
     [status-im.contexts.wallet.send.input-amount.style :as style]
     [status-im.contexts.wallet.send.routes.view :as routes]
     [utils.address :as address]
@@ -136,12 +137,12 @@
                                        (empty? @input-value)
                                        (<= input-num-value 0)
                                        (> input-num-value (:amount @current-limit)))
-            from-network              (utils/id->network (get-in route [:From :chainId]))
-            to-network                (utils/id->network (get-in route [:To :chainId]))
+            from-network              (utils/id->network (get-in route [:from :chain-id]))
+            to-network                (utils/id->network (get-in route [:to :chain-id]))
             amount                    (str @input-value " " token-symbol)
-            fees                      (when-not confirm-disabled? (utils/calculate-gas-fee route))
+            fees                      (when-not confirm-disabled? (send-utils/calculate-gas-fee route))
             native-currency-symbol    (when-not confirm-disabled?
-                                        (get-in route [:From :nativeCurrencySymbol]))]
+                                        (get-in route [:from :native-currency-symbol]))]
         (rn/use-effect
          (fn []
            (let [dismiss-keyboard-fn   #(when (= % "active") (rn/dismiss-keyboard!))

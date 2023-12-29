@@ -113,19 +113,3 @@
   {constants/mainnet-chain-id  :ethereum
    constants/optimism-chain-id :optimism
    constants/arbitrum-chain-id :arbitrum})
-
-(defn calculate-gas-fee
-  [data]
-  (let [gas-amount       (money/bignumber (get data :GasAmount))
-        gas-fees         (get data :GasFees)
-        eip1559-enabled? (get gas-fees :eip1559Enabled)
-        billion          (money/bignumber "1000000000")]
-    (if eip1559-enabled?
-      (let [base-fee      (money/bignumber (get gas-fees :baseFee))
-            priority-fee  (money/bignumber (get gas-fees :maxPriorityFeePerGas))
-            fee-with-tip  (money/bignumber (money/add base-fee priority-fee))
-            total-gas-fee (money/mul gas-amount fee-with-tip)]
-        (money/with-precision (money/div total-gas-fee billion) 10))
-      (let [gas-price     (money/bignumber (get gas-fees :gasPrice))
-            total-gas-fee (money/mul gas-amount gas-price)]
-        (money/with-precision (money/div total-gas-fee billion) 10)))))

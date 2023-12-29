@@ -1,5 +1,7 @@
 (ns status-im.contexts.wallet.send.events
   (:require
+    [camel-snake-kebab.core :as csk]
+    [camel-snake-kebab.extras :as cske]
     [status-im.constants :as constants]
     [taoensso.timbre :as log]
     [utils.money :as money]
@@ -17,10 +19,14 @@
 (rf/reg-event-fx :wallet/suggested-routes-success
  (fn [{:keys [db]} [suggested-routes timestamp]]
    (when (= (get-in db [:wallet :ui :send :suggested-routes-call-timestamp]) timestamp)
-     {:db (-> db
-              (assoc-in [:wallet :ui :send :suggested-routes] suggested-routes)
-              (assoc-in [:wallet :ui :send :route] (first (:Best suggested-routes)))
-              (assoc-in [:wallet :ui :send :loading-suggested-routes?] false))})))
+     (let [suggested-routes-data (cske/transform-keys csk/->kebab-case suggested-routes)
+           chosen-route          (->> suggested-routes-data
+                                      :best
+                                      first)]
+       {:db (-> db
+                (assoc-in [:wallet :ui :send :suggested-routes] suggested-routes-data)
+                (assoc-in [:wallet :ui :send :route] chosen-route)
+                (assoc-in [:wallet :ui :send :loading-suggested-routes?] false))}))))
 
 (rf/reg-event-fx :wallet/suggested-routes-error
  (fn [{:keys [db]} [_error]]

@@ -42,14 +42,14 @@
    :wallet/wallet-send-to-address                "0x04371e2d9d66b82f056bc128064"
    :wallet/wallet-send-token                     {:symbol :eth}
    :wallet/wallet-send-loading-suggested-routes? false
-   :wallet/wallet-send-route                     {:From      {:chainId              1
-                                                              :nativeCurrencySymbol "ETH"}
-                                                  :To        {:chainId              1
-                                                              :nativeCurrencySymbol "ETH"}
-                                                  :GasAmount "23487"
-                                                  :GasFees   {:baseFee              "32.325296406"
-                                                              :maxPriorityFeePerGas "0.011000001"
-                                                              :eip1559Enabled       true}}})
+   :wallet/wallet-send-route                     {:from       {:chainid                1
+                                                               :native-currency-symbol "ETH"}
+                                                  :to         {:chain-id               1
+                                                               :native-currency-symbol "ETH"}
+                                                  :gas-amount "23487"
+                                                  :gas-fees   {:base-fee                 "32.325296406"
+                                                               :max-priority-fee-per-gas "0.011000001"
+                                                               :eip1559-enabled          true}}})
 
 (h/describe "Send > input amount screen"
   (h/setup-restorable-re-frame)

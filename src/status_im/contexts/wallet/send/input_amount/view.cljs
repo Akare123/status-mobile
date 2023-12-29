@@ -57,7 +57,7 @@
         networks                  (rf/sub [:wallet/network-details])
         token                     (rf/sub [:wallet/wallet-send-token])
         loading-suggested-routes? (rf/sub [:wallet/wallet-send-loading-suggested-routes?])
-        token-symbol              (:symbol token)
+        token-symbol              (or (:symbol token) :eth)
         limit-crypto              (or (:total-balance token) limit)
         conversion-rate           (or rate 10)
         limit-fiat                (* limit-crypto conversion-rate)

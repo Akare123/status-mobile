@@ -115,6 +115,7 @@
   (let [on-close       (fn []
                          (rf/dispatch [:wallet/clean-scanned-address])
                          (rf/dispatch [:wallet/clean-local-suggestions])
+                         (rf/dispatch [:wallet/clean-account-selection])
                          (rf/dispatch [:wallet/select-address-tab nil])
                          (rf/dispatch [:navigate-back]))
         on-change-tab  #(rf/dispatch [:wallet/select-address-tab %])
@@ -126,7 +127,8 @@
         (rn/use-effect (fn []
                          (fn []
                            (rf/dispatch [:wallet/clean-scanned-address])
-                           (rf/dispatch [:wallet/clean-local-suggestions]))))
+                           (rf/dispatch [:wallet/clean-local-suggestions])
+                           (rf/dispatch [:wallet/clean-account-selection]))))
         [rn/scroll-view
          {:content-container-style      style/container
           :keyboard-should-persist-taps :handled

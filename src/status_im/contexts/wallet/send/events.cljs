@@ -10,10 +10,6 @@
  (fn [{:keys [db]} [tab]]
    {:db (assoc-in db [:wallet :ui :send :select-address-tab] tab)}))
 
-(rf/reg-event-fx :wallet/select-send-account-address
- (fn [{:keys [db]} [address]]
-   {:db (assoc db [:wallet :ui :send :send-account-address] address)}))
-
 (rf/reg-event-fx :wallet/suggested-routes-success
  (fn [{:keys [db]} [suggested-routes timestamp]]
    (when (= (get-in db [:wallet :ui :send :suggested-routes-call-timestamp]) timestamp)
@@ -36,9 +32,18 @@
             (update-in [:wallet :ui :send] dissoc :route)
             (update-in [:wallet :ui :send] dissoc :loading-suggested-routes?))}))
 
+(rf/reg-event-fx :wallet/select-send-account-address
+ (fn [{:keys [db]} [{:keys [address stack-id]}]]
+   {:db (-> db
+            (assoc-in [:wallet :ui :send :send-account-address] address)
+            (update-in [:wallet :ui :send] dissoc :to-address))
+    :fx [[:navigate-to-within-stack [:wallet-select-asset stack-id]]]}))
+
 (rf/reg-event-fx :wallet/select-send-address
  (fn [{:keys [db]} [{:keys [address stack-id]}]]
-   {:db (assoc-in db [:wallet :ui :send :to-address] address)
+   {:db (-> db
+            (assoc-in [:wallet :ui :send :to-address] address)
+            (update-in [:wallet :ui :send] dissoc :send-account-address))
     :fx [[:navigate-to-within-stack [:wallet-select-asset stack-id]]]}))
 
 (rf/reg-event-fx :wallet/send-select-token
@@ -54,7 +59,8 @@
  (fn [{:keys [db now]} [amount]]
    (let [wallet-address          (get-in db [:wallet :current-viewing-account-address])
          token                   (get-in db [:wallet :ui :send :token])
-         to-address              (get-in db [:wallet :ui :send :to-address])
+         account-address         (get-in db [:wallet :ui :send :send-account-address])
+         to-address              (or account-address (get-in db [:wallet :ui :send :to-address]))
          token-decimal           (:decimals token)
          token-id                (:symbol token)
          network-preferences     []

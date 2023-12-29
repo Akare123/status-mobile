@@ -66,10 +66,6 @@
      :i/advanced]]
    [quo/data-item
     {:container-style style/fees-data-item
-     :blur?           false
-     :description     :default
-     :icon-right?     false
-     :card?           false
      :label           :none
      :status          (if loading-suggested-routes? :loading :default)
      :size            :small
@@ -77,10 +73,6 @@
      :subtitle        (str fees " " native-currency-symbol)}]
    [quo/data-item
     {:container-style style/amount-data-item
-     :blur?           false
-     :description     :default
-     :icon-right?     false
-     :card?           false
      :label           :none
      :status          (if loading-suggested-routes? :loading :default)
      :size            :small

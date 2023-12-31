@@ -39,12 +39,13 @@
                             {:animated true})))
 
 (defn on-scroll-fn
-  [show-floating-scroll-down-button? distance-atom]
+  [show-floating-scroll-down-button? distance-atom layout-height-atom]
   (fn [y layout-height new-distance]
     (let [threshold-height   (* (/ layout-height 100)
                                 threshold-percentage-to-show-floating-scroll-down-button)
           reached-threshold? (> y threshold-height)]
-      (reset! distance-atom new-distance)
+      (when (= layout-height @layout-height-atom)
+        (reset! distance-atom new-distance))
       (when (not= reached-threshold? @show-floating-scroll-down-button?)
         (rn/configure-next (:ease-in-ease-out rn/layout-animation-presets))
         (reset! show-floating-scroll-down-button? reached-threshold?)))))
@@ -291,8 +292,8 @@
         change            (- layout-height-new @layout-height)
         new-distance      (- @distance-atom change)]
     (when (not= change 0)
-      (reanimated/set-shared-value distance-from-list-top new-distance)
-      (reset! distance-atom new-distance)
+      (reanimated/set-shared-value distance-from-list-top (if (pos? new-distance) new-distance 0))
+      (reset! distance-atom (if (pos? new-distance) new-distance 0))
       (reset! layout-height layout-height-new))
     (when-not (reanimated/get-shared-value calculations-complete?)
       (reanimated/set-shared-value calculations-complete? true))
@@ -353,7 +354,8 @@
                                             (worklets/messages-list-on-scroll
                                              distance-from-list-top
                                              (on-scroll-fn show-floating-scroll-down-button?
-                                                           distance-atom)))
+                                                           distance-atom
+                                                           layout-height)))
         :style                             {:background-color (colors/theme-colors colors/white
                                                                                    colors/neutral-95
                                                                                    theme)}

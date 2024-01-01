@@ -159,3 +159,5 @@
 
 (def community-accounts-selection-enabled? false)
 (def fetch-messages-enabled? (enabled? (get-config :FETCH_MESSAGES_ENABLED "1")))
+
+(def show-chat-open-indicator? (enabled? (get-config :CHAT_OPEN_INDICATOR "0")))

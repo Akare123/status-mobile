@@ -5,6 +5,7 @@
     [re-frame.core :as re-frame]
     [react-native.core :as rn]
     [react-native.reanimated :as reanimated]
+    [react-native.safe-area :as safe-area]
     [react-native.share :as share]
     [status-im.common.contact-list-item.view :as contact-list-item]
     [status-im.common.contact-list.view :as contact-list]
@@ -13,12 +14,31 @@
     [status-im.common.home.empty-state.view :as common.empty-state]
     [status-im.common.home.header-spacing.view :as common.header-spacing]
     [status-im.common.resources :as resources]
+    [status-im.config :as config]
     [status-im.contexts.chat.actions.view :as chat.actions.view]
     [status-im.contexts.chat.home.chat-list-item.view :as chat-list-item]
     [status-im.contexts.chat.home.contact-request.view :as contact-request]
     [status-im.contexts.shell.jump-to.constants :as jump-to.constants]
     [utils.i18n :as i18n]
     [utils.re-frame :as rf]))
+
+(defn- f-chat-open-indicator
+  []
+  (let [current-chat-id  (rf/sub [:chats/current-chat-id])
+        view-id          (rf/sub [:view-id])
+        background-color (reanimated/use-shared-value "transparent")]
+    (if (and (= view-id :chats-stack) current-chat-id)
+      (reanimated/animate-delay background-color "red" 300)
+      (reanimated/set-shared-value background-color "transparent"))
+    [reanimated/view
+     {:style (reanimated/apply-animations-to-style
+              {:background-color background-color}
+              {:position :absolute
+               :top      (safe-area/get-top)
+               :right    0
+               :z-index  2
+               :height   56
+               :width    10})}]))
 
 (defn get-item-layout
   [_ index]
@@ -135,6 +155,8 @@
             selected-tab                    (or (rf/sub [:messages-home/selected-tab]) :tab/recent)
             scroll-shared-value             (reanimated/use-shared-value 0)]
         [:<>
+         (when config/show-chat-open-indicator?
+           [:f> f-chat-open-indicator])
          (if (= selected-tab :tab/contacts)
            [contacts
             {:pending-contact-requests pending-contact-requests

@@ -184,3 +184,18 @@
                      :params     []
                      :on-success #(rf/dispatch [:communities/fetched-collapsed-categories-success %])
                      :on-error   #(log/error "failed to fetch collapsed community categories" %)}]}))
+
+(rf/reg-event-fx :communities/addresses-for-permissions
+ (fn [{:keys [db]} [accounts]]
+   {:db (assoc-in db [:communities/addresses-for-permissions] accounts)}))
+
+(rf/reg-event-fx :communities/toggle-address-for-permissions
+ (fn [{:keys [db]} [address]]
+   {:db (let [addresses-for-permissions (vec (get-in db [:communities/addresses-for-permissions]))]
+          (if (some #(= % address) addresses-for-permissions)
+            (assoc-in db
+             [:communities/addresses-for-permissions]
+             (remove #{address} addresses-for-permissions))
+            (assoc-in db
+             [:communities/addresses-for-permissions]
+             (conj addresses-for-permissions address))))}))

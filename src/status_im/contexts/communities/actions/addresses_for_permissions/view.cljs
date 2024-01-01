@@ -8,15 +8,16 @@
 
 (defn- account-item
   [item]
-  [quo/account-permissions
-   {:account         {:name                (:name item)
-                      :address             (:address item)
-                      :emoji               (:emoji item)
-                      :customization-color (:customization-color item)}
-    :token-details   []
-    :checked?        true
-    :on-change       not-implemented/alert
-    :container-style {:margin-bottom 8}}])
+  (let [addresses-for-permissions (rf/sub [:communities/addresses-for-permissions])]
+    [quo/account-permissions
+     {:account         {:name                (:name item)
+                        :address             (:address item)
+                        :emoji               (:emoji item)
+                        :customization-color (:customization-color item)}
+      :token-details   []
+      :checked?        (or (some #(= % (:address item)) addresses-for-permissions) false)
+      :on-change       #(rf/dispatch [:communities/toggle-address-for-permissions (:address item)])
+      :container-style {:margin-bottom 8}}]))
 
 (defn view
   []
@@ -24,7 +25,6 @@
         {:keys [name color images]} (rf/sub [:communities/community id])
         accounts                    (rf/sub [:wallet/accounts-with-customization-color])]
     [rn/safe-area-view {:style style/container}
-
      [quo/drawer-top
       {:type                :context-tag
        :title               (i18n/label :t/addresses-for-permissions)

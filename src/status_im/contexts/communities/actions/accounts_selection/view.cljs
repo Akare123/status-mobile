@@ -32,11 +32,15 @@
      :community-name  community-name
      :container-style {:margin-top 8}}]])
 
-(defn view
+(defn f-view-internal
   []
   (let [{id :community-id}          (rf/sub [:get-screen-params])
         {:keys [name color images]} (rf/sub [:communities/community id])
-        accounts                    (rf/sub [:wallet/accounts-with-customization-color])]
+        accounts                    (rf/sub [:wallet/accounts-with-customization-color])
+        addresses-for-permissions   (rf/sub [:communities/addresses-for-permissions])]
+    (rn/use-effect (fn []
+                     (rf/dispatch [:communities/addresses-for-permissions (map :address accounts)]))
+                   [])
     [rn/view {:style style/container}
      [quo/page-nav
       {:text-align          :left
@@ -63,7 +67,8 @@
                       :action            :arrow
                       :label             :preview
                       :label-props       {:type :accounts
-                                          :data accounts}
+                                          :data (filter #(some #{(:address %)} addresses-for-permissions)
+                                                        accounts)}
                       :description-props {:text (i18n/label :t/all-addresses)}}
                      {:title             (i18n/label :t/for-airdrops)
                       :on-press          #(rf/dispatch [:open-modal :airdrop-addresses
@@ -88,3 +93,7 @@
         :track-icon          :i/face-id
         :customization-color color
         :on-complete         #(join-community-and-navigate-back id)}]]]))
+
+(defn view
+  []
+  [:f> f-view-internal])

@@ -4,20 +4,30 @@
             [status-im.common.not-implemented :as not-implemented]
             [status-im.contexts.communities.actions.addresses-for-permissions.style :as style]
             [utils.i18n :as i18n]
-            [utils.re-frame :as rf]))
+            [utils.re-frame :as rf]
+            [reagent.core :as reagent]))
 
 (defn- account-item
   [item]
-  (let [addresses-for-permissions (rf/sub [:communities/addresses-for-permissions])]
-    [quo/account-permissions
-     {:account         {:name                (:name item)
-                        :address             (:address item)
-                        :emoji               (:emoji item)
-                        :customization-color (:customization-color item)}
-      :token-details   []
-      :checked?        (or (some #(= % (:address item)) addresses-for-permissions) false)
-      :on-change       #(rf/dispatch [:communities/toggle-address-for-permissions (:address item)])
-      :container-style {:margin-bottom 8}}]))
+  (let [addresses-for-permissions (rf/sub [:communities/addresses-for-permissions])
+        selected-addresses        (reagent/atom addresses-for-permissions)]
+    (fn []
+      [quo/account-permissions
+       {:account         {:name                (:name item)
+                          :address             (:address item)
+                          :emoji               (:emoji item)
+                          :customization-color (:customization-color item)}
+        :token-details   []
+        :checked?        (or (some #(= % (:address item)) @selected-addresses) false)
+        ;; :on-change       #(rf/dispatch [:communities/toggle-address-for-permissions (:address
+        ;; item)])
+        :on-change       (fn [checked?]
+                           (if checked?
+                             (swap! selected-addresses conj (:address item))
+                             (swap! selected-addresses #(remove (fn [address]
+                                                                  (= address (:address item)))
+                                                                %))))
+        :container-style {:margin-bottom 8}}])))
 
 (defn view
   []
